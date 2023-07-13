@@ -7,6 +7,8 @@ import tiktoken
 
 from services.openai import get_embeddings
 
+from dotenv import load_dotenv
+load_dotenv()
 # Global variables
 tokenizer = tiktoken.get_encoding(
     "cl100k_base"

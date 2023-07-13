@@ -5,6 +5,8 @@ from loguru import logger
 
 from tenacity import retry, wait_random_exponential, stop_after_attempt
 
+from dotenv import load_dotenv
+load_dotenv()
 
 @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(3))
 def get_embeddings(texts: List[str]) -> List[List[float]]:

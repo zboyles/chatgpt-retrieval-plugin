@@ -5,6 +5,8 @@ from typing import Union
 from azure.search.documents.indexes import SearchIndexClient
 from models.models import DocumentMetadataFilter, Query, Source, Document, DocumentMetadata
 
+from dotenv import load_dotenv
+load_dotenv()
 AZURESEARCH_TEST_INDEX = "testindex"
 os.environ["AZURESEARCH_INDEX"] = AZURESEARCH_TEST_INDEX
 if os.environ.get("AZURESEARCH_SERVICE") == None:

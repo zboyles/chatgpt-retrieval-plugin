@@ -1,6 +1,8 @@
 import os
 from services.openai import get_chat_completion
 
+from dotenv import load_dotenv
+load_dotenv()
 
 def screen_text_for_pii(text: str) -> bool:
     # This prompt is just an example, change it to fit your use case

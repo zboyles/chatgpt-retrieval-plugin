@@ -4,6 +4,8 @@ import json
 from typing import Dict
 import os
 from loguru import logger
+from dotenv import load_dotenv
+load_dotenv()
 
 def extract_metadata_from_document(text: str) -> Dict[str, str]:
     sources = Source.__members__.keys()

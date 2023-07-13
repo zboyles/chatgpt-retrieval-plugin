@@ -1,6 +1,7 @@
 from datastore.datastore import DataStore
 import os
-
+from dotenv import load_dotenv
+load_dotenv()
 
 async def get_datastore() -> DataStore:
     datastore = os.environ.get("DATASTORE")
