@@ -18,12 +18,17 @@ from models.api import (
     GitSearchResponse,
     QueryRequest,
     QueryResponse,
+    SerpSearchARunRequest,
+    SerpSearchARunResponse,
+    SerpSearchRunRequest,
+    SerpSearchRunResponse,
     UpsertRequest,
     UpsertResponse,
 )
 from datastore.factory import get_datastore
 from services.file import get_document_from_file
 from server.tools.git_search import GitSearch
+from server.tools.web.serp_search import SerpSearch
 from models.models import DocumentMetadata, Source
 from dotenv import load_dotenv
 load_dotenv()
@@ -234,6 +239,62 @@ async def reset_db():
         git_search = GitSearch()
         success = await git_search.reset_db()
         return GitSearchResetDbResponse(success)
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500, detail="Internal Service Error")
+
+@app.post(
+    "/search-run",
+    response_model=SerpSearchRunResponse,
+    description="Endpoint for running a search query using SerpSearch. Accepts a request object containing the query to run and returns the search results.",
+
+)
+def search_run(
+    request: SerpSearchRunRequest = Body(...),
+):
+    """
+    Endpoint for running a search query using SerpSearch.
+
+    Args:
+        request (SerpSearchRunRequest): The request object containing the query to run.
+
+    Returns:
+        SerpSearchRunResponse: The response object containing the search results.
+    """
+    if not request.query:
+        raise HTTPException(
+            status_code=400,
+            detail="query is required",
+        )
+
+    try:
+        query = request.query
+        serp_search = SerpSearch()
+        results = serp_search.run(query=query)
+        return SerpSearchRunResponse(results=results)
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500, detail="Internal Service Error")
+
+@app.post(
+    "/search-arun",
+    response_model=SerpSearchARunResponse,
+)
+async def search_arun(
+    request: SerpSearchARunRequest = Body(...),
+):
+
+    if not request.query:
+        raise HTTPException(
+            status_code=400,
+            detail="query is required",
+        )
+
+    try:
+        query = request.query
+        serp_search = SerpSearch()
+        results = await serp_search.arun(query=query)
+        return SerpSearchRunResponse(results=results)
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500, detail="Internal Service Error")

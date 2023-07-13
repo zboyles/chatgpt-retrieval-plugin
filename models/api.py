@@ -5,7 +5,7 @@ from models.models import (
     QueryResult,
 )
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 
 class UpsertRequest(BaseModel):
@@ -67,4 +67,25 @@ class GitSearchResetDbRequest(BaseModel):
 
 class GitSearchResetDbResponse(BaseModel):
     success: bool
+
+
+class SerpSearchRunRequest(BaseModel):
+    query: str
+
+
+class SerpSearchRunResponse(BaseModel):
+    results: str
+
+
+class SerpSearchARunRequest(BaseModel):
+    query: str
+
+
+class SerpSearchARunResponse(BaseModel):
+    results: str
+
+
+
+
+
 

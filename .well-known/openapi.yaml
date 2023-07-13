@@ -32,6 +32,32 @@ paths:
                 $ref: "#/components/schemas/HTTPValidationError"
       security:
         - HTTPBearer: []
+  /search-run:
+    post:
+      summary: Internet Search
+      description: Plugin for running an internet search query through a search provider to find answers to questions and retrieve relevant information. Use it whenever a user asks something that might be found with Google search.
+      operationId: serp_search_run_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SerpSearchRunRequest"
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SerpSearchRunResponse"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+      security:
+        - HTTPBearer: []
 components:
   schemas:
     DocumentChunkMetadata:
