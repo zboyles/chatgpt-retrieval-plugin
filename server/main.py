@@ -9,6 +9,13 @@ from loguru import logger
 from models.api import (
     DeleteRequest,
     DeleteResponse,
+    GitSearchAddRequest,
+    GitSearchAddResponse,
+    GitSearchListRequest,
+    GitSearchListResponse,
+    GitSearchResetDbResponse,
+    GitSearchRequest,
+    GitSearchResponse,
     QueryRequest,
     QueryResponse,
     UpsertRequest,
@@ -16,7 +23,7 @@ from models.api import (
 )
 from datastore.factory import get_datastore
 from services.file import get_document_from_file
-
+from server.tools.git_search import GitSearch
 from models.models import DocumentMetadata, Source
 from dotenv import load_dotenv
 load_dotenv()
@@ -143,6 +150,90 @@ async def delete(
             delete_all=request.delete_all,
         )
         return DeleteResponse(success=success)
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500, detail="Internal Service Error")
+
+@app.post(
+    "/git-search",
+    response_model=GitSearchResponse,
+)
+async def git_search(
+    request: GitSearchRequest = Body(...),   
+):
+    if not request.url:
+        raise HTTPException(
+            status_code=400,
+            detail="url is required",
+        )
+    try:
+        url = request.url
+        if hasattr(request, "query"):
+            query = request.query
+            results = await git_search(url, query)
+        else:
+            results = await git_search(url)
+        return GitSearchResponse(results=results)
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500, detail="Internal Service Error")
+
+
+@app.post(
+    "/list",
+    response_model=GitSearchListResponse,
+)
+async def list(
+    request: GitSearchListRequest = Body(...),
+):
+    try:
+        git_search = GitSearch()
+        include_files = hasattr(request, "include_files") and request.include_files or False
+        results = await git_search.list(include_files)
+        print(results)
+        return GitSearchListResponse(results=results)
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500, detail="Internal Service Error")
+
+
+@app.post(
+    "/add",
+    response_model=GitSearchAddResponse,
+)
+async def add(
+    request: GitSearchAddRequest = Body(...),
+):
+    print(request)
+    
+    if not request.urls:
+        raise HTTPException(
+            status_code=400,
+            detail="url is required",
+        )
+    try:
+        urls = request.urls
+        filter = hasattr(request, "filter") and request.filter or None
+        git_search = GitSearch()
+        total_added = await git_search.add(urls, filter)
+        print(f"total_added: {total_added}")
+        response = GitSearchAddResponse(total_added=total_added)
+        print(response)
+        return response
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=500, detail="Internal Service Error")
+
+
+@app.delete(
+    "/reset-db",
+    response_model=GitSearchResetDbResponse,
+)
+async def reset_db():
+    try:
+        git_search = GitSearch()
+        success = await git_search.reset_db()
+        return GitSearchResetDbResponse(success)
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500, detail="Internal Service Error")
